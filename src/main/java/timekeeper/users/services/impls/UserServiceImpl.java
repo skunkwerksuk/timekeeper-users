@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
     return userRepository.save(user);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public User getUserById(Long employeeId) {
     Optional<User> user = userRepository.findById(employeeId);
@@ -49,11 +50,13 @@ public class UserServiceImpl implements UserService {
     return user.get();
   }
 
+  @Transactional(readOnly = true)
   @Override
   public User getUserByEmail(String emailAddress) {
     return userRepository.findUserByEmailAddress(emailAddress);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public User getUserByName(String firstName, String lastName) {
     return userRepository.findUserByFirstNameAndLastName(firstName, lastName);
