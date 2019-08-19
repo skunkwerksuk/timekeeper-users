@@ -4,9 +4,9 @@ import timekeeper.users.models.User;
 
 public interface UserService {
 
-  void registerUser(User user);
+  User registerUser(User user);
 
-  void deleteUser(Long employeeId);
+  User deleteUser(Long employeeId);
 
   User updateUser(Long employeeId, User user);
 
@@ -15,6 +15,4 @@ public interface UserService {
   User getUserByEmail(String emailAddress);
 
   User getUserByName(String firstName, String lastName);
-
-  void makeUserApprover(Long employeeId, Long approverId);
 }
