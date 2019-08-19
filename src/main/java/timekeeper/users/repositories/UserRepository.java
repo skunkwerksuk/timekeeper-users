@@ -5,4 +5,8 @@ import org.springframework.stereotype.Repository;
 import timekeeper.users.models.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {}
+public interface UserRepository extends JpaRepository<User, Long> {
+  User findUserByFirstNameAndLastName(String firstName, String lastName);
+
+  User findUserByEmailAddress(String emailAddress);
+}

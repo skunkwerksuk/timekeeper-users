@@ -45,19 +45,18 @@ public class UserServiceImpl implements UserService {
   @Override
   public User getUserById(Long employeeId) {
     Optional<User> user = userRepository.findById(employeeId);
-    if (!user.isPresent())
-      throw new InvalidUserException("No user found with id: " + employeeId);
+    if (!user.isPresent()) throw new InvalidUserException("No user found with id: " + employeeId);
     return user.get();
   }
 
   @Override
   public User getUserByEmail(String emailAddress) {
-    return null;
+    return userRepository.findUserByEmailAddress(emailAddress);
   }
 
   @Override
   public User getUserByName(String firstName, String lastName) {
-    return null;
+    return userRepository.findUserByFirstNameAndLastName(firstName, lastName);
   }
 
   /**
