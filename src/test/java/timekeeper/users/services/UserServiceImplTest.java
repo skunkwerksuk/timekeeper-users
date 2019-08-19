@@ -34,9 +34,10 @@ public class UserServiceImplTest {
   }
 
   @Test
-  public void registerUser_Successful() {
+  public void registerUser_successful() {
     final User expectedUser = TestUtils.getDefaultUser();
 
+    when(mockUserRepository.findById(expectedUser.getEmployeeId())).thenReturn(Optional.empty());
     when(mockUserRepository.save(any(User.class))).thenReturn(expectedUser);
 
     final User returnedUser = userService.registerUser(expectedUser);
@@ -45,8 +46,20 @@ public class UserServiceImplTest {
     assertEquals(expectedUser, returnedUser);
   }
 
+  @Test(expected = InvalidUserException.class)
+  public void registerUser_alreadyExists() {
+    final User expectedUser = TestUtils.getDefaultUser();
+    when(mockUserRepository.findById(expectedUser.getEmployeeId()))
+        .thenReturn(Optional.of(expectedUser));
+
+    userService.registerUser(expectedUser);
+
+    verify(mockUserRepository, times(1)).findById(expectedUser.getEmployeeId());
+    verifyNoMoreInteractions(mockUserRepository);
+  }
+
   @Test
-  public void deleteUser_Successful() {
+  public void deleteUser_successful() {
     User toBeDeleted = TestUtils.getDefaultUser();
     Long toBeDeletedEmployeeId = toBeDeleted.getEmployeeId();
     when(mockUserRepository.findById(toBeDeletedEmployeeId)).thenReturn(Optional.of(toBeDeleted));
@@ -61,7 +74,7 @@ public class UserServiceImplTest {
   }
 
   @Test(expected = InvalidUserException.class)
-  public void deleteUser_NotFound() {
+  public void deleteUser_notFound() {
     long id = 1234;
     when(mockUserRepository.findById(id)).thenReturn(Optional.empty());
     userService.deleteUser(id);
@@ -71,7 +84,7 @@ public class UserServiceImplTest {
   }
 
   @Test
-  public void updateUser_Successful() {
+  public void updateUser_successful() {
     User originalUser = TestUtils.getDefaultUser();
     User toBeUpdated = TestUtils.getDefaultUser();
     toBeUpdated.setFirstName("Thomas");
@@ -91,7 +104,7 @@ public class UserServiceImplTest {
   }
 
   @Test(expected = InvalidUserException.class)
-  public void updateUser_NotFound() {
+  public void updateUser_notFound() {
     User toBeUpdated = TestUtils.getDefaultUser();
 
     when(mockUserRepository.findById(toBeUpdated.getEmployeeId())).thenReturn(Optional.empty());
@@ -103,7 +116,7 @@ public class UserServiceImplTest {
   }
 
   @Test(expected = InvalidUserException.class)
-  public void updateUser_DifferentIds() {
+  public void updateUser_differentIds() {
     User toBeUpdated = TestUtils.getDefaultUser();
     User originalUser = TestUtils.getDefaultUser();
     originalUser.setEmployeeId((long) 54321);
@@ -118,7 +131,7 @@ public class UserServiceImplTest {
   }
 
   @Test
-  public void findUserById_Successful() {
+  public void findUserById_successful() {
     User expectedUser = TestUtils.getDefaultUser();
     when(mockUserRepository.findById(expectedUser.getEmployeeId()))
         .thenReturn(Optional.of(expectedUser));
@@ -127,7 +140,7 @@ public class UserServiceImplTest {
   }
 
   @Test(expected = InvalidUserException.class)
-  public void findUserById_NotFound() {
+  public void findUserById_notFound() {
     User user = TestUtils.getDefaultUser();
     when(mockUserRepository.findById(user.getEmployeeId())).thenReturn(Optional.empty());
     userService.getUserById(user.getEmployeeId());

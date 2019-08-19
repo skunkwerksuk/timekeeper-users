@@ -18,6 +18,9 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @Override
   public User registerUser(User user) {
+    Optional<User> existingUser = userRepository.findById(user.getEmployeeId());
+    if (existingUser.isPresent())
+      throw new InvalidUserException("User already exists with id: " + user.getEmployeeId());
     return userRepository.save(user);
   }
 
