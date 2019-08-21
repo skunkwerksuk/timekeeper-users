@@ -1,5 +1,6 @@
 package timekeeper.users.services.impls;
 
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,8 +74,14 @@ public class UserServiceImpl implements UserService {
 
   @Transactional(readOnly = true)
   @Override
-  public User getAllUsersByApprover(Long approverId) {
-    return null;
+  public List<User> getAllUsersByApprover(Long approverId) {
+    Optional<User> approver = userRepository.findById(approverId);
+    if (!approver.isPresent())
+      throw new InvalidUserException("No approver found with id: " + approverId);
+    Optional<List<User>> userList = userRepository.findAllByApproverId(approverId);
+    if (!userList.isPresent())
+      throw new InvalidUserException("No users found for the approver with id: " + approverId);
+    return userList.get();
   }
 
   /**
