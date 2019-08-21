@@ -1,5 +1,6 @@
 package timekeeper.users.services.impls;
 
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,13 +57,31 @@ public class UserServiceImpl implements UserService {
   @Transactional(readOnly = true)
   @Override
   public User getUserByEmail(String emailAddress) {
-    return userRepository.findUserByEmailAddress(emailAddress);
+    Optional<User> user = userRepository.findUserByEmailAddress(emailAddress);
+    if (!user.isPresent())
+      throw new InvalidUserException("No user found with email address: " + emailAddress);
+    return user.get();
   }
 
   @Transactional(readOnly = true)
   @Override
   public User getUserByName(String firstName, String lastName) {
-    return userRepository.findUserByFirstNameAndLastName(firstName, lastName);
+    Optional<User> user = userRepository.findUserByFirstNameAndLastName(firstName, lastName);
+    if (!user.isPresent())
+      throw new InvalidUserException("No user found with name: " + firstName + " " + lastName);
+    return user.get();
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public List<User> getAllUsersByApprover(Long approverId) {
+    Optional<User> approver = userRepository.findById(approverId);
+    if (!approver.isPresent())
+      throw new InvalidUserException("No approver found with id: " + approverId);
+    Optional<List<User>> userList = userRepository.findAllByApproverId(approverId);
+    if (!userList.isPresent())
+      throw new InvalidUserException("No users found for the approver with id: " + approverId);
+    return userList.get();
   }
 
   /**
