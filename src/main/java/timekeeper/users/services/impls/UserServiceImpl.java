@@ -56,13 +56,25 @@ public class UserServiceImpl implements UserService {
   @Transactional(readOnly = true)
   @Override
   public User getUserByEmail(String emailAddress) {
-    return userRepository.findUserByEmailAddress(emailAddress);
+    Optional<User> user = userRepository.findUserByEmailAddress(emailAddress);
+    if (!user.isPresent())
+      throw new InvalidUserException("No user found with email address: " + emailAddress);
+    return user.get();
   }
 
   @Transactional(readOnly = true)
   @Override
   public User getUserByName(String firstName, String lastName) {
-    return userRepository.findUserByFirstNameAndLastName(firstName, lastName);
+    Optional<User> user = userRepository.findUserByFirstNameAndLastName(firstName, lastName);
+    if (!user.isPresent())
+      throw new InvalidUserException("No user found with name: " + firstName + " " + lastName);
+    return user.get();
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public User getAllUsersByApprover(Long approverId) {
+    return null;
   }
 
   /**

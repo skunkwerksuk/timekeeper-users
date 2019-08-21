@@ -15,4 +15,6 @@ public interface UserService {
   User getUserByEmail(String emailAddress);
 
   User getUserByName(String firstName, String lastName);
+
+  User getAllUsersByApprover(Long approverId);
 }

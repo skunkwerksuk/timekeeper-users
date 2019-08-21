@@ -145,4 +145,40 @@ public class UserServiceImplTest {
     when(mockUserRepository.findById(user.getEmployeeId())).thenReturn(Optional.empty());
     userService.getUserById(user.getEmployeeId());
   }
+
+  @Test
+  public void findUserByEmail_successful() {
+    User expectedUser = TestUtils.getDefaultUser();
+    when(mockUserRepository.findUserByEmailAddress(expectedUser.getEmailAddress()))
+        .thenReturn(Optional.of(expectedUser));
+    User actual = userService.getUserByEmail(expectedUser.getEmailAddress());
+    assertEquals(expectedUser, actual);
+  }
+
+  @Test(expected = InvalidUserException.class)
+  public void findUserByEmail_notFound() {
+    User user = TestUtils.getDefaultUser();
+    when(mockUserRepository.findUserByEmailAddress(user.getEmailAddress()))
+        .thenReturn(Optional.empty());
+    userService.getUserByEmail(user.getEmailAddress());
+  }
+
+  @Test
+  public void findUserByName_successful() {
+    User expectedUser = TestUtils.getDefaultUser();
+    when(mockUserRepository.findUserByFirstNameAndLastName(
+            expectedUser.getFirstName(), expectedUser.getLastName()))
+        .thenReturn(Optional.of(expectedUser));
+    User actual =
+        userService.getUserByName(expectedUser.getFirstName(), expectedUser.getLastName());
+    assertEquals(expectedUser, actual);
+  }
+
+  @Test(expected = InvalidUserException.class)
+  public void findUserByName_notFound() {
+    User user = TestUtils.getDefaultUser();
+    when(mockUserRepository.findUserByFirstNameAndLastName(user.getFirstName(), user.getLastName()))
+        .thenReturn(Optional.empty());
+    userService.getUserByName(user.getFirstName(), user.getLastName());
+  }
 }
