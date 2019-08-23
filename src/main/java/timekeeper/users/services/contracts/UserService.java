@@ -5,7 +5,7 @@ import timekeeper.users.models.User;
 
 public interface UserService {
 
-  User registerUser(User user);
+  User createUser(User user);
 
   User deleteUser(Long employeeId);
 

@@ -4,7 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static timekeeper.users.utils.TestUtils.*;
+import static timekeeper.users.utils.TestUtils.getDefaultUser;
+import static timekeeper.users.utils.TestUtils.getListOfUsers;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import timekeeper.users.services.impls.UserServiceImpl;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class UserServiceImplTest {
+public class UserServiceImplTests {
 
   private UserServiceImpl userService;
 
@@ -41,7 +42,7 @@ public class UserServiceImplTest {
     when(mockUserRepository.findById(expectedUser.getEmployeeId())).thenReturn(Optional.empty());
     when(mockUserRepository.save(any(User.class))).thenReturn(expectedUser);
 
-    final User returnedUser = userService.registerUser(expectedUser);
+    final User returnedUser = userService.createUser(expectedUser);
 
     verify(mockUserRepository, times(1)).save(any(User.class));
     assertEquals(expectedUser, returnedUser);
@@ -53,7 +54,7 @@ public class UserServiceImplTest {
     when(mockUserRepository.findById(expectedUser.getEmployeeId()))
         .thenReturn(Optional.of(expectedUser));
 
-    userService.registerUser(expectedUser);
+    userService.createUser(expectedUser);
 
     verify(mockUserRepository, times(1)).findById(expectedUser.getEmployeeId());
     verifyNoMoreInteractions(mockUserRepository);
