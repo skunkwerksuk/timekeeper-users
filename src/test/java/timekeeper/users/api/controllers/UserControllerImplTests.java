@@ -1,4 +1,4 @@
-package timekeeper.users.controllers;
+package timekeeper.users.api.controllers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -24,15 +24,15 @@ import timekeeper.users.services.impls.UserServiceImpl;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class UserControllerTests {
+public class UserControllerImplTests {
 
-  @Autowired private UserController controller;
+  @Autowired private UserControllerImpl controller;
 
   private UserService mockUserService;
 
   @Before
   public void setUp() {
-    controller = new UserController();
+    controller = new UserControllerImpl();
     mockUserService = mock(UserServiceImpl.class);
     controller.setUserService(mockUserService);
   }
@@ -43,7 +43,7 @@ public class UserControllerTests {
     ResponseEntity<User> expectedResponse = new ResponseEntity<>(expectedUser, HttpStatus.OK);
     when(mockUserService.getUserById(expectedUser.getEmployeeId())).thenReturn(expectedUser);
 
-    ResponseEntity<User> actualResponse = controller.getUser(expectedUser.getEmployeeId());
+    ResponseEntity<User> actualResponse = controller.getUserById(expectedUser.getEmployeeId());
 
     assertEquals(expectedResponse, actualResponse);
   }
@@ -54,7 +54,7 @@ public class UserControllerTests {
     when(mockUserService.getUserById(employeeId))
         .thenThrow(new InvalidUserException("user not found"));
 
-    ResponseEntity actual = controller.getUser(employeeId);
+    ResponseEntity actual = controller.getUserById(employeeId);
 
     assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
     assertEquals("user not found", Objects.requireNonNull(actual.getBody()).toString());
@@ -66,7 +66,7 @@ public class UserControllerTests {
     when(mockUserService.getUserById(employeeId))
         .thenThrow(new RuntimeException("something broke"));
 
-    ResponseEntity actual = controller.getUser(employeeId);
+    ResponseEntity actual = controller.getUserById(employeeId);
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
