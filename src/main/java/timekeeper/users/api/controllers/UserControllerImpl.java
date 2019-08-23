@@ -79,6 +79,18 @@ public class UserControllerImpl implements UserControllerDocs {
   }
 
   @Override
+  public ResponseEntity deleteUser(long userId) {
+    try {
+      userService.deleteUser(userId);
+      return new ResponseEntity<>("User with userId " + userId + " successfully deleted.", OK);
+    } catch (InvalidUserException e) {
+      throw new ResponseStatusException(NOT_FOUND, e.getLocalizedMessage());
+    } catch (Exception e) {
+      throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+    }
+  }
+
+  @Override
   public ResponseEntity getUsersByApprover(long approverId) {
     try {
       List<User> usersList = userService.getAllUsersByApprover(approverId);

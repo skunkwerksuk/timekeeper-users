@@ -145,6 +145,42 @@ public class UserControllerImplTests {
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
   }
 
+  public void getUsersByApproverId_Successful() {
+    List<User> expectedUsers = getListOfUsers();
+    long approverId = 1234;
+    ResponseEntity<List<User>> expectedResponse =
+        new ResponseEntity<>(expectedUsers, HttpStatus.OK);
+    when(mockUserService.getAllUsersByApprover(approverId)).thenReturn(expectedUsers);
+
+    ResponseEntity actualResponse = controller.getUsersByApprover(approverId);
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void getUsersByApproverId_ApproverNotFound() {
+    long approverId = 12345;
+    when(mockUserService.getAllUsersByApprover(approverId))
+        .thenThrow(new InvalidUserException("approver not found"));
+
+    ResponseEntity actual = controller.getUsersByApprover(approverId);
+
+    assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
+    assertEquals("approver not found", Objects.requireNonNull(actual.getBody()).toString());
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void getUsersByApproverId_InternalServerError() {
+    long approverId = 12345;
+    when(mockUserService.getAllUsersByApprover(approverId))
+        .thenThrow(new RuntimeException("something broke"));
+
+    ResponseEntity actual = controller.getUsersByApprover(approverId);
+
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
+    assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
+  }
+
   @Test
   public void createUser_Successful() {
     User userToCreate = getDefaultUser();
@@ -221,37 +257,37 @@ public class UserControllerImplTests {
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
   }
 
-  public void getUsersByApproverId_Successful() {
-    List<User> expectedUsers = getListOfUsers();
-    long approverId = 1234;
-    ResponseEntity<List<User>> expectedResponse =
-        new ResponseEntity<>(expectedUsers, HttpStatus.OK);
-    when(mockUserService.getAllUsersByApprover(approverId)).thenReturn(expectedUsers);
+  @Test
+  public void deleteUser_Successful() {
+    long userIdToDelete = 1234;
+    ResponseEntity expectedResponse =
+        new ResponseEntity<>("User with userId 1234 successfully deleted.", HttpStatus.OK);
+    when(mockUserService.deleteUser(userIdToDelete)).thenReturn(getDefaultUser());
 
-    ResponseEntity actualResponse = controller.getUsersByApprover(approverId);
+    ResponseEntity actualResponse = controller.deleteUser(userIdToDelete);
 
     assertEquals(expectedResponse, actualResponse);
   }
 
   @Test(expected = ResponseStatusException.class)
-  public void getUsersByApproverId_ApproverNotFound() {
-    long approverId = 12345;
-    when(mockUserService.getAllUsersByApprover(approverId))
-        .thenThrow(new InvalidUserException("approver not found"));
+  public void deleteUser_NotFound() {
+    long userIdToDelete = 1234;
+    when(mockUserService.deleteUser(userIdToDelete))
+        .thenThrow(new InvalidUserException("user not found"));
 
-    ResponseEntity actual = controller.getUsersByApprover(approverId);
+    ResponseEntity actualResponse = controller.deleteUser(userIdToDelete);
 
-    assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
-    assertEquals("approver not found", Objects.requireNonNull(actual.getBody()).toString());
+    assertEquals(HttpStatus.NOT_FOUND, actualResponse.getStatusCode());
+    assertEquals("user not found", Objects.requireNonNull(actualResponse.getBody()).toString());
   }
 
   @Test(expected = ResponseStatusException.class)
-  public void getUsersByApproverId_InternalServerError() {
-    long approverId = 12345;
-    when(mockUserService.getAllUsersByApprover(approverId))
+  public void deleteUser_InternalServerError() {
+    long userIdToDelete = 1234;
+    when(mockUserService.deleteUser(userIdToDelete))
         .thenThrow(new RuntimeException("something broke"));
 
-    ResponseEntity actual = controller.getUsersByApprover(approverId);
+    ResponseEntity actual = controller.deleteUser(userIdToDelete);
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());

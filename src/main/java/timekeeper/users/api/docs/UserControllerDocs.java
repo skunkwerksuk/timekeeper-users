@@ -46,6 +46,20 @@ public interface UserControllerDocs {
       @ApiParam(value = "The first name of the user", required = true) String firstName,
       @ApiParam(value = "The last name of the user", required = true) String lastName);
 
+  @ApiOperation(value = "Get a all users who have the specified approver", response = List.class)
+  @ApiResponses(
+      value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "No approver found with id: {approverId}"),
+        @ApiResponse(code = 500, message = "Internal server error")
+      })
+  @GetMapping("/get-users-by-approver")
+  ResponseEntity getUsersByApprover(
+      @ApiParam(
+              value = "The id of the approver that you want to get the users for",
+              required = true)
+          long approverId);
+
   @ApiOperation(value = "Add a new user to the database")
   @ApiResponses(
       value = {
@@ -73,17 +87,14 @@ public interface UserControllerDocs {
       @ApiParam(value = "The user object with the updated details", required = true)
           User userToUpdate);
 
-  @ApiOperation(value = "Get a all users who have the specified approver", response = List.class)
+  @ApiOperation(value = "Delete a user from the database")
   @ApiResponses(
       value = {
         @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 404, message = "No approver found with id: {approverId}"),
+        @ApiResponse(code = 404, message = "No user found with id: {userId}"),
         @ApiResponse(code = 500, message = "Internal server error")
       })
-  @GetMapping("/get-users-by-approver")
-  ResponseEntity getUsersByApprover(
-      @ApiParam(
-              value = "The id of the approver that you want to get the users for",
-              required = true)
-          long approverId);
+  @DeleteMapping("/delete-user")
+  ResponseEntity deleteUser(
+      @ApiParam(value = "The id of the user to be deleted", required = true) long userId);
 }
