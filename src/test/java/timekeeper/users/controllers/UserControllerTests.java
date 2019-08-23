@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static timekeeper.users.utils.TestUtils.getDefaultUser;
+import static timekeeper.users.utils.TestUtils.getListOfUsers;
 
+import java.util.List;
 import java.util.Objects;
 import org.junit.Before;
 import org.junit.Test;
@@ -214,6 +216,42 @@ public class UserControllerTests {
         .thenThrow(new RuntimeException("something broke"));
 
     ResponseEntity actual = controller.updateUser(userToUpdate.getEmployeeId(), userToUpdate);
+
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
+    assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
+  }
+
+  public void getUsersByApproverId_Successful() {
+    List<User> expectedUsers = getListOfUsers();
+    long approverId = 1234;
+    ResponseEntity<List<User>> expectedResponse =
+        new ResponseEntity<>(expectedUsers, HttpStatus.OK);
+    when(mockUserService.getAllUsersByApprover(approverId)).thenReturn(expectedUsers);
+
+    ResponseEntity actualResponse = controller.getUsersByApprover(approverId);
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void getUsersByApproverId_ApproverNotFound() {
+    long approverId = 12345;
+    when(mockUserService.getAllUsersByApprover(approverId))
+        .thenThrow(new InvalidUserException("approver not found"));
+
+    ResponseEntity actual = controller.getUsersByApprover(approverId);
+
+    assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
+    assertEquals("approver not found", Objects.requireNonNull(actual.getBody()).toString());
+  }
+
+  @Test(expected = ResponseStatusException.class)
+  public void getUsersByApproverId_InternalServerError() {
+    long approverId = 12345;
+    when(mockUserService.getAllUsersByApprover(approverId))
+        .thenThrow(new RuntimeException("something broke"));
+
+    ResponseEntity actual = controller.getUsersByApprover(approverId);
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
