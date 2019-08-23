@@ -18,9 +18,10 @@ public class SwaggerConfig {
   public Docket api() {
     return new Docket(DocumentationType.SWAGGER_2)
         .select()
-        .apis(RequestHandlerSelectors.basePackage("timekeeper.users.controllers"))
+        .apis(RequestHandlerSelectors.basePackage("timekeeper.users.api.controllers"))
         .paths(PathSelectors.any())
         .build()
+        .useDefaultResponseMessages(false)
         .apiInfo(apiInfo());
   }
 
