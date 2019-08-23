@@ -2,6 +2,7 @@ package timekeeper.users.controllers;
 
 import static org.springframework.http.HttpStatus.*;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,6 +71,18 @@ public class UserController {
     try {
       userService.updateUser(userId, userToUpdate);
       return new ResponseEntity<>("User with userId " + userId + " successfully updated.", OK);
+    } catch (InvalidUserException e) {
+      throw new ResponseStatusException(NOT_FOUND, e.getLocalizedMessage());
+    } catch (Exception e) {
+      throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+    }
+  }
+
+  @GetMapping("/get-users-by-approver")
+  public ResponseEntity getUsersByApprover(@RequestParam long approverId) {
+    try {
+      List<User> usersList = userService.getAllUsersByApprover(approverId);
+      return new ResponseEntity<>(usersList, OK);
     } catch (InvalidUserException e) {
       throw new ResponseStatusException(NOT_FOUND, e.getLocalizedMessage());
     } catch (Exception e) {
