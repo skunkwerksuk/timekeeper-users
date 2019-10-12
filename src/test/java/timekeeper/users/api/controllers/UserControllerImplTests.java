@@ -8,6 +8,7 @@ import static timekeeper.users.utils.TestUtils.getListOfUsers;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,23 +42,22 @@ public class UserControllerImplTests {
   public void getUserById_Successful() {
     User expectedUser = getDefaultUser();
     ResponseEntity<User> expectedResponse = new ResponseEntity<>(expectedUser, HttpStatus.OK);
-    when(mockUserService.getUserById(expectedUser.getEmployeeId())).thenReturn(expectedUser);
+    when(mockUserService.getUserById(expectedUser.getEmployeeId()))
+        .thenReturn(Optional.of(expectedUser));
 
     ResponseEntity<User> actualResponse = controller.getUserById(expectedUser.getEmployeeId());
 
     assertEquals(expectedResponse, actualResponse);
   }
 
-  @Test(expected = ResponseStatusException.class)
+  @Test
   public void getUserById_NotFound() {
     long employeeId = 12345;
-    when(mockUserService.getUserById(employeeId))
-        .thenThrow(new InvalidUserException("user not found"));
+    when(mockUserService.getUserById(employeeId)).thenReturn(Optional.empty());
 
     ResponseEntity actual = controller.getUserById(employeeId);
 
     assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
-    assertEquals("user not found", Objects.requireNonNull(actual.getBody()).toString());
   }
 
   @Test(expected = ResponseStatusException.class)
@@ -76,23 +76,22 @@ public class UserControllerImplTests {
   public void getUserByEmail_Successful() {
     User expectedUser = getDefaultUser();
     ResponseEntity<User> expectedResponse = new ResponseEntity<>(expectedUser, HttpStatus.OK);
-    when(mockUserService.getUserByEmail(expectedUser.getEmailAddress())).thenReturn(expectedUser);
+    when(mockUserService.getUserByEmail(expectedUser.getEmailAddress()))
+        .thenReturn(Optional.of(expectedUser));
 
     ResponseEntity<User> actualResponse = controller.getUserByEmail(expectedUser.getEmailAddress());
 
     assertEquals(expectedResponse, actualResponse);
   }
 
-  @Test(expected = ResponseStatusException.class)
+  @Test
   public void getUserByEmail_NotFound() {
     String email = "test@email.com";
-    when(mockUserService.getUserByEmail(email))
-        .thenThrow(new InvalidUserException("user not found"));
+    when(mockUserService.getUserByEmail(email)).thenReturn(Optional.empty());
 
     ResponseEntity actual = controller.getUserByEmail(email);
 
     assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
-    assertEquals("user not found", Objects.requireNonNull(actual.getBody()).toString());
   }
 
   @Test(expected = ResponseStatusException.class)
@@ -111,7 +110,7 @@ public class UserControllerImplTests {
     User expectedUser = getDefaultUser();
     ResponseEntity<User> expectedResponse = new ResponseEntity<>(expectedUser, HttpStatus.OK);
     when(mockUserService.getUserByName(expectedUser.getFirstName(), expectedUser.getLastName()))
-        .thenReturn(expectedUser);
+        .thenReturn(Optional.of(expectedUser));
 
     ResponseEntity<User> actualResponse =
         controller.getUserByName(expectedUser.getFirstName(), expectedUser.getLastName());
@@ -119,17 +118,15 @@ public class UserControllerImplTests {
     assertEquals(expectedResponse, actualResponse);
   }
 
-  @Test(expected = ResponseStatusException.class)
+  @Test
   public void getUserByName_NotFound() {
     String firstName = "John";
     String lastName = "Doe";
-    when(mockUserService.getUserByName(firstName, lastName))
-        .thenThrow(new InvalidUserException("user not found"));
+    when(mockUserService.getUserByName(firstName, lastName)).thenReturn(Optional.empty());
 
     ResponseEntity actual = controller.getUserByName(firstName, lastName);
 
     assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
-    assertEquals("user not found", Objects.requireNonNull(actual.getBody()).toString());
   }
 
   @Test(expected = ResponseStatusException.class)

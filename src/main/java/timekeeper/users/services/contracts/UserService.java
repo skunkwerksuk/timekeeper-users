@@ -1,6 +1,7 @@
 package timekeeper.users.services.contracts;
 
 import java.util.List;
+import java.util.Optional;
 import timekeeper.users.models.User;
 
 public interface UserService {
@@ -11,11 +12,11 @@ public interface UserService {
 
   User updateUser(Long employeeId, User user);
 
-  User getUserById(Long employeeId);
+  Optional<User> getUserById(Long employeeId);
 
-  User getUserByEmail(String emailAddress);
+  Optional<User> getUserByEmail(String emailAddress);
 
-  User getUserByName(String firstName, String lastName);
+  Optional<User> getUserByName(String firstName, String lastName);
 
   List<User> getAllUsersByApprover(Long approverId);
 }

@@ -5,7 +5,7 @@ import static org.springframework.http.HttpStatus.*;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import timekeeper.users.api.docs.UserControllerDocs;
 import timekeeper.users.exceptions.InvalidUserException;
@@ -20,10 +20,10 @@ public class UserControllerImpl implements UserControllerDocs {
   @Override
   public ResponseEntity<User> getUserById(long employeeId) {
     try {
-      User userToReturn = userService.getUserById(employeeId);
-      return new ResponseEntity<>(userToReturn, OK);
-    } catch (InvalidUserException e) {
-      throw new ResponseStatusException(NOT_FOUND, e.getLocalizedMessage());
+      return userService
+          .getUserById(employeeId)
+          .map(user -> new ResponseEntity<>(user, OK))
+          .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     } catch (Exception e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
@@ -32,10 +32,10 @@ public class UserControllerImpl implements UserControllerDocs {
   @Override
   public ResponseEntity<User> getUserByEmail(String emailAddress) {
     try {
-      User userToReturn = userService.getUserByEmail(emailAddress);
-      return new ResponseEntity<>(userToReturn, OK);
-    } catch (InvalidUserException e) {
-      throw new ResponseStatusException(NOT_FOUND, e.getLocalizedMessage());
+      return userService
+          .getUserByEmail(emailAddress)
+          .map(user -> new ResponseEntity<>(user, OK))
+          .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     } catch (Exception e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
@@ -44,10 +44,10 @@ public class UserControllerImpl implements UserControllerDocs {
   @Override
   public ResponseEntity<User> getUserByName(String firstName, String lastName) {
     try {
-      User userToReturn = userService.getUserByName(firstName, lastName);
-      return new ResponseEntity<>(userToReturn, OK);
-    } catch (InvalidUserException e) {
-      throw new ResponseStatusException(NOT_FOUND, e.getLocalizedMessage());
+      return userService
+              .getUserByName(firstName, lastName)
+              .map(user -> new ResponseEntity<>(user, OK))
+              .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     } catch (Exception e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
