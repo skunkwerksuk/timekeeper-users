@@ -134,35 +134,40 @@ public class UserServiceImplTests {
 
   @Test
   public void findUserById_successful() {
-    User expectedUser = getDefaultUser();
-    when(mockUserRepository.findById(expectedUser.getEmployeeId()))
-        .thenReturn(Optional.of(expectedUser));
-    User actual = userService.getUserById(expectedUser.getEmployeeId());
+    Optional<User> expectedUser = Optional.of(getDefaultUser());
+    when(mockUserRepository.findById(expectedUser.get().getEmployeeId())).thenReturn(expectedUser);
+    Optional<User> actual = userService.getUserById(expectedUser.get().getEmployeeId());
+
     assertEquals(expectedUser, actual);
   }
 
-  @Test(expected = InvalidUserException.class)
+  @Test
   public void findUserById_notFound() {
     User user = getDefaultUser();
     when(mockUserRepository.findById(user.getEmployeeId())).thenReturn(Optional.empty());
-    userService.getUserById(user.getEmployeeId());
+    Optional<User> actualUser = userService.getUserById(user.getEmployeeId());
+
+    assertEquals(Optional.empty(), actualUser);
   }
 
   @Test
   public void findUserByEmail_successful() {
-    User expectedUser = getDefaultUser();
-    when(mockUserRepository.findUserByEmailAddress(expectedUser.getEmailAddress()))
-        .thenReturn(Optional.of(expectedUser));
-    User actual = userService.getUserByEmail(expectedUser.getEmailAddress());
+    Optional<User> expectedUser = Optional.of(getDefaultUser());
+    when(mockUserRepository.findUserByEmailAddress(expectedUser.get().getEmailAddress()))
+        .thenReturn(expectedUser);
+    Optional<User> actual = userService.getUserByEmail(expectedUser.get().getEmailAddress());
+
     assertEquals(expectedUser, actual);
   }
 
-  @Test(expected = InvalidUserException.class)
+  @Test
   public void findUserByEmail_notFound() {
     User user = getDefaultUser();
     when(mockUserRepository.findUserByEmailAddress(user.getEmailAddress()))
         .thenReturn(Optional.empty());
-    userService.getUserByEmail(user.getEmailAddress());
+    Optional<User> actualUser = userService.getUserByEmail(user.getEmailAddress());
+
+    assertEquals(Optional.empty(), actualUser);
   }
 
   @Test
@@ -171,17 +176,22 @@ public class UserServiceImplTests {
     when(mockUserRepository.findUserByFirstNameAndLastName(
             expectedUser.getFirstName(), expectedUser.getLastName()))
         .thenReturn(Optional.of(expectedUser));
-    User actual =
+
+    Optional<User> actual =
         userService.getUserByName(expectedUser.getFirstName(), expectedUser.getLastName());
-    assertEquals(expectedUser, actual);
+
+    assertEquals(Optional.of(expectedUser), actual);
   }
 
-  @Test(expected = InvalidUserException.class)
+  @Test
   public void findUserByName_notFound() {
     User user = getDefaultUser();
     when(mockUserRepository.findUserByFirstNameAndLastName(user.getFirstName(), user.getLastName()))
         .thenReturn(Optional.empty());
-    userService.getUserByName(user.getFirstName(), user.getLastName());
+
+    Optional<User> actualUser = userService.getUserByName(user.getFirstName(), user.getLastName());
+
+    assertEquals(Optional.empty(), actualUser);
   }
 
   @Test

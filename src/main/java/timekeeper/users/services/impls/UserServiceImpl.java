@@ -48,28 +48,20 @@ public class UserServiceImpl implements UserService {
 
   @Transactional(readOnly = true)
   @Override
-  public User getUserById(Long employeeId) {
-    Optional<User> user = userRepository.findById(employeeId);
-    if (!user.isPresent()) throw new InvalidUserException("No user found with id: " + employeeId);
-    return user.get();
+  public Optional<User> getUserById(Long employeeId) {
+    return userRepository.findById(employeeId);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public User getUserByEmail(String emailAddress) {
-    Optional<User> user = userRepository.findUserByEmailAddress(emailAddress);
-    if (!user.isPresent())
-      throw new InvalidUserException("No user found with email address: " + emailAddress);
-    return user.get();
+  public Optional<User> getUserByEmail(String emailAddress) {
+    return userRepository.findUserByEmailAddress(emailAddress);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public User getUserByName(String firstName, String lastName) {
-    Optional<User> user = userRepository.findUserByFirstNameAndLastName(firstName, lastName);
-    if (!user.isPresent())
-      throw new InvalidUserException("No user found with name: " + firstName + " " + lastName);
-    return user.get();
+  public Optional<User> getUserByName(String firstName, String lastName) {
+    return userRepository.findUserByFirstNameAndLastName(firstName, lastName);
   }
 
   @Transactional(readOnly = true)
