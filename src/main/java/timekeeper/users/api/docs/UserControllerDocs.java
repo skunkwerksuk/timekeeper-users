@@ -9,16 +9,16 @@ import timekeeper.users.models.User;
 
 @Api(value = "User API", description = "Endpoints allowing CRUD operations on the user table")
 public interface UserControllerDocs {
-  @ApiOperation(value = "Get a user by employeeId", response = User.class)
+  @ApiOperation(value = "Get a user by userId", response = User.class)
   @ApiResponses(
       value = {
         @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 404, message = "No user found with id: {employeeId}"),
+        @ApiResponse(code = 404, message = "No user found with id: {userId}"),
         @ApiResponse(code = 500, message = "Internal server error")
       })
   @GetMapping("/get-user-by-id")
   ResponseEntity<User> getUserById(
-      @ApiParam(value = "The id of the user", required = true) long employeeId);
+      @ApiParam(value = "The id of the user", required = true) long userId);
 
   @ApiOperation(value = "Get a user by their email address", response = User.class)
   @ApiResponses(
@@ -64,7 +64,7 @@ public interface UserControllerDocs {
   @ApiResponses(
       value = {
         @ApiResponse(code = 201, message = "User {emailAddress} successfully created."),
-        @ApiResponse(code = 409, message = "User already exists with id: {employeeId}"),
+        @ApiResponse(code = 409, message = "User already exists with id: {userId}"),
         @ApiResponse(code = 500, message = "Internal server error")
       })
   @PostMapping("/create-user")

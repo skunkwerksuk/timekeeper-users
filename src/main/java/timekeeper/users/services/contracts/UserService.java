@@ -8,11 +8,11 @@ public interface UserService {
 
   User createUser(User user);
 
-  User deleteUser(Long employeeId);
+  User deleteUser(Long userId);
 
-  User updateUser(Long employeeId, User user);
+  User updateUser(Long userId, User user);
 
-  Optional<User> getUserById(Long employeeId);
+  Optional<User> getUserById(Long userId);
 
   Optional<User> getUserByEmail(String emailAddress);
 

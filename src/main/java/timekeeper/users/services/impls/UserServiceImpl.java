@@ -19,37 +19,37 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @Override
   public User createUser(User user) {
-    Optional<User> existingUser = userRepository.findById(user.getEmployeeId());
+    Optional<User> existingUser = userRepository.findById(user.getUserId());
     if (existingUser.isPresent())
-      throw new InvalidUserException("User already exists with id: " + user.getEmployeeId());
+      throw new InvalidUserException("User already exists with id: " + user.getUserId());
     return userRepository.save(user);
   }
 
   @Transactional(rollbackFor = InvalidUserException.class)
   @Override
-  public User deleteUser(Long employeeId) throws InvalidUserException {
-    Optional<User> toBeDeleted = userRepository.findById(employeeId);
+  public User deleteUser(Long userId) throws InvalidUserException {
+    Optional<User> toBeDeleted = userRepository.findById(userId);
     if (!toBeDeleted.isPresent())
-      throw new InvalidUserException("No user found with id: " + employeeId);
-    userRepository.deleteById(employeeId);
+      throw new InvalidUserException("No user found with id: " + userId);
+    userRepository.deleteById(userId);
     return toBeDeleted.get();
   }
 
   @Transactional(rollbackFor = InvalidUserException.class)
   @Override
-  public User updateUser(Long employeeId, User user) {
-    Optional<User> toBeUpdated = userRepository.findById(employeeId);
+  public User updateUser(Long userId, User user) {
+    Optional<User> toBeUpdated = userRepository.findById(userId);
     if (!toBeUpdated.isPresent())
-      throw new InvalidUserException("No user found with id: " + employeeId);
-    if (!user.getEmployeeId().equals(toBeUpdated.get().getEmployeeId()))
-      throw new InvalidUserException("employeeId's do not match");
+      throw new InvalidUserException("No user found with id: " + userId);
+    if (!user.getUserId().equals(toBeUpdated.get().getUserId()))
+      throw new InvalidUserException("userId's do not match");
     return userRepository.save(user);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Optional<User> getUserById(Long employeeId) {
-    return userRepository.findById(employeeId);
+  public Optional<User> getUserById(Long userId) {
+    return userRepository.findById(userId);
   }
 
   @Transactional(readOnly = true)

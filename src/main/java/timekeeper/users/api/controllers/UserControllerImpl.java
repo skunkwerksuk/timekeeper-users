@@ -18,10 +18,10 @@ public class UserControllerImpl implements UserControllerDocs {
   @Autowired UserService userService;
 
   @Override
-  public ResponseEntity<User> getUserById(long employeeId) {
+  public ResponseEntity<User> getUserById(long userId) {
     try {
       return userService
-          .getUserById(employeeId)
+          .getUserById(userId)
           .map(user -> new ResponseEntity<>(user, OK))
           .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     } catch (Exception e) {
@@ -45,9 +45,9 @@ public class UserControllerImpl implements UserControllerDocs {
   public ResponseEntity<User> getUserByName(String firstName, String lastName) {
     try {
       return userService
-              .getUserByName(firstName, lastName)
-              .map(user -> new ResponseEntity<>(user, OK))
-              .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+          .getUserByName(firstName, lastName)
+          .map(user -> new ResponseEntity<>(user, OK))
+          .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     } catch (Exception e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }

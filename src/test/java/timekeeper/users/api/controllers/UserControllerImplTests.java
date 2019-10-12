@@ -42,31 +42,30 @@ public class UserControllerImplTests {
   public void getUserById_Successful() {
     User expectedUser = getDefaultUser();
     ResponseEntity<User> expectedResponse = new ResponseEntity<>(expectedUser, HttpStatus.OK);
-    when(mockUserService.getUserById(expectedUser.getEmployeeId()))
+    when(mockUserService.getUserById(expectedUser.getUserId()))
         .thenReturn(Optional.of(expectedUser));
 
-    ResponseEntity<User> actualResponse = controller.getUserById(expectedUser.getEmployeeId());
+    ResponseEntity<User> actualResponse = controller.getUserById(expectedUser.getUserId());
 
     assertEquals(expectedResponse, actualResponse);
   }
 
   @Test
   public void getUserById_NotFound() {
-    long employeeId = 12345;
-    when(mockUserService.getUserById(employeeId)).thenReturn(Optional.empty());
+    long userId = 12345;
+    when(mockUserService.getUserById(userId)).thenReturn(Optional.empty());
 
-    ResponseEntity actual = controller.getUserById(employeeId);
+    ResponseEntity actual = controller.getUserById(userId);
 
     assertEquals(HttpStatus.NOT_FOUND, actual.getStatusCode());
   }
 
   @Test(expected = ResponseStatusException.class)
   public void getUserById_InternalServerError() {
-    long employeeId = 12345;
-    when(mockUserService.getUserById(employeeId))
-        .thenThrow(new RuntimeException("something broke"));
+    long userId = 12345;
+    when(mockUserService.getUserById(userId)).thenThrow(new RuntimeException("something broke"));
 
-    ResponseEntity actual = controller.getUserById(employeeId);
+    ResponseEntity actual = controller.getUserById(userId);
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
@@ -220,11 +219,10 @@ public class UserControllerImplTests {
     User userToUpdate = getDefaultUser();
     ResponseEntity expectedResponse =
         new ResponseEntity<>("User with userId 123 successfully updated.", HttpStatus.OK);
-    when(mockUserService.updateUser(userToUpdate.getEmployeeId(), userToUpdate))
+    when(mockUserService.updateUser(userToUpdate.getUserId(), userToUpdate))
         .thenReturn(userToUpdate);
 
-    ResponseEntity actualResponse =
-        controller.updateUser(userToUpdate.getEmployeeId(), userToUpdate);
+    ResponseEntity actualResponse = controller.updateUser(userToUpdate.getUserId(), userToUpdate);
 
     assertEquals(expectedResponse, actualResponse);
   }
@@ -232,11 +230,10 @@ public class UserControllerImplTests {
   @Test(expected = ResponseStatusException.class)
   public void updateUser_NotFound() {
     User userToUpdate = getDefaultUser();
-    when(mockUserService.updateUser(userToUpdate.getEmployeeId(), userToUpdate))
+    when(mockUserService.updateUser(userToUpdate.getUserId(), userToUpdate))
         .thenThrow(new InvalidUserException("user not found"));
 
-    ResponseEntity actualResponse =
-        controller.updateUser(userToUpdate.getEmployeeId(), userToUpdate);
+    ResponseEntity actualResponse = controller.updateUser(userToUpdate.getUserId(), userToUpdate);
 
     assertEquals(HttpStatus.NOT_FOUND, actualResponse.getStatusCode());
     assertEquals("user not found", Objects.requireNonNull(actualResponse.getBody()).toString());
@@ -245,10 +242,10 @@ public class UserControllerImplTests {
   @Test(expected = ResponseStatusException.class)
   public void updateUser_InternalServerError() {
     User userToUpdate = getDefaultUser();
-    when(mockUserService.updateUser(userToUpdate.getEmployeeId(), userToUpdate))
+    when(mockUserService.updateUser(userToUpdate.getUserId(), userToUpdate))
         .thenThrow(new RuntimeException("something broke"));
 
-    ResponseEntity actual = controller.updateUser(userToUpdate.getEmployeeId(), userToUpdate);
+    ResponseEntity actual = controller.updateUser(userToUpdate.getUserId(), userToUpdate);
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
