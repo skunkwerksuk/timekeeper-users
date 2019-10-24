@@ -18,11 +18,12 @@ public class UserServiceImpl implements UserService {
 
   @Transactional
   @Override
-  public User createUser(User user) {
-    Optional<User> existingUser = userRepository.findById(user.getUserId());
+  public User createUser(String firstName, String lastName, String emailAddress, Long approverId) {
+    Optional<User> existingUser = getUserByEmail(emailAddress);
     if (existingUser.isPresent())
-      throw new InvalidUserException("User already exists with id: " + user.getUserId());
-    return userRepository.save(user);
+      throw new InvalidUserException(
+          "User already exists with id: " + existingUser.get().getUserId());
+    return userRepository.save(new User(0L, firstName, lastName, emailAddress, approverId));
   }
 
   @Transactional(rollbackFor = InvalidUserException.class)

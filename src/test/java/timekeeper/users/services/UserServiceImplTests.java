@@ -36,27 +36,36 @@ public class UserServiceImplTests {
   }
 
   @Test
-  public void registerUser_successful() {
+  public void createUser_successful() {
     final User expectedUser = getDefaultUser();
 
     when(mockUserRepository.findById(expectedUser.getUserId())).thenReturn(Optional.empty());
     when(mockUserRepository.save(any(User.class))).thenReturn(expectedUser);
 
-    final User returnedUser = userService.createUser(expectedUser);
+    final User returnedUser =
+        userService.createUser(
+            expectedUser.getFirstName(),
+            expectedUser.getLastName(),
+            expectedUser.getEmailAddress(),
+            expectedUser.getApproverId());
 
     verify(mockUserRepository, times(1)).save(any(User.class));
     assertEquals(expectedUser, returnedUser);
   }
 
   @Test(expected = InvalidUserException.class)
-  public void registerUser_alreadyExists() {
+  public void createUser_alreadyExists() {
     final User expectedUser = getDefaultUser();
-    when(mockUserRepository.findById(expectedUser.getUserId()))
+    when(mockUserRepository.findUserByEmailAddress(expectedUser.getEmailAddress()))
         .thenReturn(Optional.of(expectedUser));
 
-    userService.createUser(expectedUser);
+    userService.createUser(
+        expectedUser.getFirstName(),
+        expectedUser.getLastName(),
+        expectedUser.getEmailAddress(),
+        expectedUser.getApproverId());
 
-    verify(mockUserRepository, times(1)).findById(expectedUser.getUserId());
+    verify(mockUserRepository, times(1)).findUserByEmailAddress(expectedUser.getEmailAddress());
     verifyNoMoreInteractions(mockUserRepository);
   }
 

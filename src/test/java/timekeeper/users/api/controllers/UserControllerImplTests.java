@@ -182,9 +182,19 @@ public class UserControllerImplTests {
     User userToCreate = getDefaultUser();
     ResponseEntity expectedResponse =
         new ResponseEntity<>("User john.doe@email.com successfully created.", HttpStatus.CREATED);
-    when(mockUserService.createUser(userToCreate)).thenReturn(userToCreate);
+    when(mockUserService.createUser(
+            userToCreate.getFirstName(),
+            userToCreate.getLastName(),
+            userToCreate.getEmailAddress(),
+            userToCreate.getApproverId()))
+        .thenReturn(userToCreate);
 
-    ResponseEntity actualResponse = controller.createUser(userToCreate);
+    ResponseEntity actualResponse =
+        controller.createUser(
+            userToCreate.getFirstName(),
+            userToCreate.getLastName(),
+            userToCreate.getEmailAddress(),
+            userToCreate.getApproverId());
 
     assertEquals(expectedResponse, actualResponse);
   }
@@ -192,10 +202,19 @@ public class UserControllerImplTests {
   @Test(expected = ResponseStatusException.class)
   public void createUser_AlreadyExists() {
     User userToCreate = getDefaultUser();
-    when(mockUserService.createUser(userToCreate))
+    when(mockUserService.createUser(
+            userToCreate.getFirstName(),
+            userToCreate.getLastName(),
+            userToCreate.getEmailAddress(),
+            userToCreate.getApproverId()))
         .thenThrow(new InvalidUserException("user already exists"));
 
-    ResponseEntity actualResponse = controller.createUser(userToCreate);
+    ResponseEntity actualResponse =
+        controller.createUser(
+            userToCreate.getFirstName(),
+            userToCreate.getLastName(),
+            userToCreate.getEmailAddress(),
+            userToCreate.getApproverId());
 
     assertEquals(HttpStatus.CONFLICT, actualResponse.getStatusCode());
     assertEquals(
@@ -205,10 +224,19 @@ public class UserControllerImplTests {
   @Test(expected = ResponseStatusException.class)
   public void createUser_InternalServerError() {
     User userToCreate = getDefaultUser();
-    when(mockUserService.createUser(userToCreate))
+    when(mockUserService.createUser(
+            userToCreate.getFirstName(),
+            userToCreate.getLastName(),
+            userToCreate.getEmailAddress(),
+            userToCreate.getApproverId()))
         .thenThrow(new RuntimeException("something broke"));
 
-    ResponseEntity actual = controller.createUser(userToCreate);
+    ResponseEntity actual =
+        controller.createUser(
+            userToCreate.getFirstName(),
+            userToCreate.getLastName(),
+            userToCreate.getEmailAddress(),
+            userToCreate.getApproverId());
 
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
     assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());

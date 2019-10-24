@@ -2,7 +2,6 @@ package timekeeper.users.api.docs;
 
 import io.swagger.annotations.*;
 import java.util.List;
-import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import timekeeper.users.models.User;
@@ -69,10 +68,11 @@ public interface UserControllerDocs {
       })
   @PostMapping("/create-user")
   ResponseEntity createUser(
-      @ApiParam(value = "The user object to be added to the database", required = true)
-          @Valid
-          @RequestBody
-          User userToAdd);
+      @ApiParam(value = "The first name of the new user", required = true) String firstName,
+      @ApiParam(value = "The last name of the new user", required = true) String lastName,
+      @ApiParam(value = "The email address of the new user", required = true) String emailAddress,
+      @ApiParam(value = "The id of the user who approves the new users absences", required = true)
+          Long approverId);
 
   @ApiOperation(value = "Update a user in the database")
   @ApiResponses(

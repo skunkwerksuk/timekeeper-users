@@ -6,7 +6,7 @@ import timekeeper.users.models.User;
 
 public interface UserService {
 
-  User createUser(User user);
+  User createUser(String firstName, String lastName, String emailAddress, Long approverId);
 
   User deleteUser(Long userId);
 

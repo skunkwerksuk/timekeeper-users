@@ -54,11 +54,11 @@ public class UserControllerImpl implements UserControllerDocs {
   }
 
   @Override
-  public ResponseEntity createUser(User userToAdd) {
+  public ResponseEntity createUser(
+      String firstName, String lastName, String emailAddress, Long approverId) {
     try {
-      userService.createUser(userToAdd);
-      return new ResponseEntity<>(
-          "User " + userToAdd.getEmailAddress() + " successfully created.", CREATED);
+      userService.createUser(firstName, lastName, emailAddress, approverId);
+      return new ResponseEntity<>("User " + emailAddress + " successfully created.", CREATED);
     } catch (InvalidUserException e) {
       throw new ResponseStatusException(CONFLICT, e.getLocalizedMessage());
     } catch (Exception e) {
