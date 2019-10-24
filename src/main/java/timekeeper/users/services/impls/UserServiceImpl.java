@@ -48,10 +48,6 @@ public class UserServiceImpl implements UserService {
     presentUser.setEmailAddress(emailAddress);
     presentUser.setApproverId(approverId);
 
-    System.out.println("Parameter being passed in: " + firstName);
-    System.out.println("Original user first name: " + toBeUpdated.get().getFirstName());
-    System.out.println("First name being set: " + presentUser.getFirstName());
-
     return Optional.of(userRepository.save(presentUser));
   }
 
