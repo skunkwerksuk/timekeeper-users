@@ -1,7 +1,6 @@
 package timekeeper.users.services;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static timekeeper.users.utils.TestUtils.getDefaultUser;
@@ -36,40 +35,49 @@ public class UserServiceImplTests {
   }
 
   @Test
-  public void registerUser_successful() {
+  public void createUser_successful() {
     final User expectedUser = getDefaultUser();
 
-    when(mockUserRepository.findById(expectedUser.getEmployeeId())).thenReturn(Optional.empty());
+    when(mockUserRepository.findById(expectedUser.getUserId())).thenReturn(Optional.empty());
     when(mockUserRepository.save(any(User.class))).thenReturn(expectedUser);
 
-    final User returnedUser = userService.createUser(expectedUser);
+    final User returnedUser =
+        userService.createUser(
+            expectedUser.getFirstName(),
+            expectedUser.getLastName(),
+            expectedUser.getEmailAddress(),
+            expectedUser.getApproverId());
 
     verify(mockUserRepository, times(1)).save(any(User.class));
     assertEquals(expectedUser, returnedUser);
   }
 
   @Test(expected = InvalidUserException.class)
-  public void registerUser_alreadyExists() {
+  public void createUser_alreadyExists() {
     final User expectedUser = getDefaultUser();
-    when(mockUserRepository.findById(expectedUser.getEmployeeId()))
+    when(mockUserRepository.findUserByEmailAddress(expectedUser.getEmailAddress()))
         .thenReturn(Optional.of(expectedUser));
 
-    userService.createUser(expectedUser);
+    userService.createUser(
+        expectedUser.getFirstName(),
+        expectedUser.getLastName(),
+        expectedUser.getEmailAddress(),
+        expectedUser.getApproverId());
 
-    verify(mockUserRepository, times(1)).findById(expectedUser.getEmployeeId());
+    verify(mockUserRepository, times(1)).findUserByEmailAddress(expectedUser.getEmailAddress());
     verifyNoMoreInteractions(mockUserRepository);
   }
 
   @Test
   public void deleteUser_successful() {
     User toBeDeleted = getDefaultUser();
-    Long toBeDeletedEmployeeId = toBeDeleted.getEmployeeId();
-    when(mockUserRepository.findById(toBeDeletedEmployeeId)).thenReturn(Optional.of(toBeDeleted));
+    Long toBeDeleteduserId = toBeDeleted.getUserId();
+    when(mockUserRepository.findById(toBeDeleteduserId)).thenReturn(Optional.of(toBeDeleted));
 
-    User deleted = userService.deleteUser(toBeDeletedEmployeeId);
+    User deleted = userService.deleteUser(toBeDeleteduserId);
 
-    verify(mockUserRepository, times(1)).findById(toBeDeletedEmployeeId);
-    verify(mockUserRepository, times(1)).deleteById(toBeDeletedEmployeeId);
+    verify(mockUserRepository, times(1)).findById(toBeDeleteduserId);
+    verify(mockUserRepository, times(1)).deleteById(toBeDeleteduserId);
     verifyNoMoreInteractions(mockUserRepository);
 
     assertEquals(toBeDeleted, deleted);
@@ -88,55 +96,59 @@ public class UserServiceImplTests {
   @Test
   public void updateUser_successful() {
     User originalUser = getDefaultUser();
-    User toBeUpdated = getDefaultUser();
-    toBeUpdated.setFirstName("Thomas");
+    User toBeUpdated =
+        new User(
+            originalUser.getUserId(),
+            "Thomas",
+            originalUser.getLastName(),
+            originalUser.getEmailAddress(),
+            originalUser.getApproverId());
 
-    when(mockUserRepository.findById(toBeUpdated.getEmployeeId()))
+    when(mockUserRepository.findById(toBeUpdated.getUserId()))
         .thenReturn(Optional.of(originalUser));
+
     when(mockUserRepository.save(toBeUpdated)).thenReturn(toBeUpdated);
 
-    User updatedUser = userService.updateUser(originalUser.getEmployeeId(), toBeUpdated);
+    User updatedUser =
+        userService
+            .updateUser(
+                toBeUpdated.getUserId(),
+                toBeUpdated.getFirstName(),
+                toBeUpdated.getLastName(),
+                toBeUpdated.getEmailAddress(),
+                toBeUpdated.getApproverId())
+            .get();
 
-    verify(mockUserRepository, times(1)).findById(toBeUpdated.getEmployeeId());
+    assertEquals("Thomas", updatedUser.getFirstName());
+
+    verify(mockUserRepository, times(1)).findById(toBeUpdated.getUserId());
     verify(mockUserRepository, times(1)).save(any(User.class));
     verifyNoMoreInteractions(mockUserRepository);
-
-    assertNotEquals(originalUser.getFirstName(), updatedUser.getFirstName());
-    assertEquals("Thomas", updatedUser.getFirstName());
   }
 
-  @Test(expected = InvalidUserException.class)
   public void updateUser_notFound() {
     User toBeUpdated = getDefaultUser();
 
-    when(mockUserRepository.findById(toBeUpdated.getEmployeeId())).thenReturn(Optional.empty());
+    when(mockUserRepository.findById(toBeUpdated.getUserId())).thenReturn(Optional.empty());
 
-    userService.updateUser(toBeUpdated.getEmployeeId(), toBeUpdated);
+    Optional<User> actualUser =
+        userService.updateUser(
+            toBeUpdated.getUserId(),
+            toBeUpdated.getFirstName(),
+            toBeUpdated.getLastName(),
+            toBeUpdated.getEmailAddress(),
+            toBeUpdated.getApproverId());
 
-    verify(mockUserRepository, times(1)).findById(toBeUpdated.getEmployeeId());
-    verifyNoMoreInteractions(mockUserRepository);
-  }
-
-  @Test(expected = InvalidUserException.class)
-  public void updateUser_differentIds() {
-    User toBeUpdated = getDefaultUser();
-    User originalUser = getDefaultUser();
-    originalUser.setEmployeeId((long) 54321);
-
-    when(mockUserRepository.findById(originalUser.getEmployeeId()))
-        .thenReturn(Optional.of(originalUser));
-
-    userService.updateUser(toBeUpdated.getEmployeeId(), toBeUpdated);
-
-    verify(mockUserRepository, times(1)).findById(originalUser.getEmployeeId());
+    assertEquals(Optional.empty(), actualUser);
+    verify(mockUserRepository, times(1)).findById(toBeUpdated.getUserId());
     verifyNoMoreInteractions(mockUserRepository);
   }
 
   @Test
   public void findUserById_successful() {
     Optional<User> expectedUser = Optional.of(getDefaultUser());
-    when(mockUserRepository.findById(expectedUser.get().getEmployeeId())).thenReturn(expectedUser);
-    Optional<User> actual = userService.getUserById(expectedUser.get().getEmployeeId());
+    when(mockUserRepository.findById(expectedUser.get().getUserId())).thenReturn(expectedUser);
+    Optional<User> actual = userService.getUserById(expectedUser.get().getUserId());
 
     assertEquals(expectedUser, actual);
   }
@@ -144,8 +156,8 @@ public class UserServiceImplTests {
   @Test
   public void findUserById_notFound() {
     User user = getDefaultUser();
-    when(mockUserRepository.findById(user.getEmployeeId())).thenReturn(Optional.empty());
-    Optional<User> actualUser = userService.getUserById(user.getEmployeeId());
+    when(mockUserRepository.findById(user.getUserId())).thenReturn(Optional.empty());
+    Optional<User> actualUser = userService.getUserById(user.getUserId());
 
     assertEquals(Optional.empty(), actualUser);
   }
@@ -198,11 +210,11 @@ public class UserServiceImplTests {
   public void findAllUsersWithApprover_successful() {
     User approver = getDefaultUser();
     List<User> expectedUsers = getListOfUsers();
-    when(mockUserRepository.findById(approver.getEmployeeId())).thenReturn(Optional.of(approver));
-    when(mockUserRepository.findAllByApproverId(approver.getEmployeeId()))
+    when(mockUserRepository.findById(approver.getUserId())).thenReturn(Optional.of(approver));
+    when(mockUserRepository.findAllByApproverId(approver.getUserId()))
         .thenReturn(Optional.of(getListOfUsers()));
 
-    List<User> actualUsers = userService.getAllUsersByApprover(approver.getEmployeeId());
+    List<User> actualUsers = userService.getAllUsersByApprover(approver.getUserId());
 
     assertEquals(expectedUsers, actualUsers);
   }
@@ -210,7 +222,7 @@ public class UserServiceImplTests {
   @Test(expected = InvalidUserException.class)
   public void findAllUsersWithApprover_approverNotFound() {
     User approver = getDefaultUser();
-    when(mockUserRepository.findById(approver.getEmployeeId())).thenReturn(Optional.empty());
-    userService.getAllUsersByApprover(approver.getEmployeeId());
+    when(mockUserRepository.findById(approver.getUserId())).thenReturn(Optional.empty());
+    userService.getAllUsersByApprover(approver.getUserId());
   }
 }

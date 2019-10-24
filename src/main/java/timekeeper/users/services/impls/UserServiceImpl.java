@@ -18,38 +18,43 @@ public class UserServiceImpl implements UserService {
 
   @Transactional
   @Override
-  public User createUser(User user) {
-    Optional<User> existingUser = userRepository.findById(user.getEmployeeId());
+  public User createUser(String firstName, String lastName, String emailAddress, Long approverId) {
+    Optional<User> existingUser = getUserByEmail(emailAddress);
     if (existingUser.isPresent())
-      throw new InvalidUserException("User already exists with id: " + user.getEmployeeId());
-    return userRepository.save(user);
+      throw new InvalidUserException(
+          "User already exists with id: " + existingUser.get().getUserId());
+    return userRepository.save(new User(0L, firstName, lastName, emailAddress, approverId));
   }
 
   @Transactional(rollbackFor = InvalidUserException.class)
   @Override
-  public User deleteUser(Long employeeId) throws InvalidUserException {
-    Optional<User> toBeDeleted = userRepository.findById(employeeId);
-    if (!toBeDeleted.isPresent())
-      throw new InvalidUserException("No user found with id: " + employeeId);
-    userRepository.deleteById(employeeId);
+  public User deleteUser(Long userId) throws InvalidUserException {
+    Optional<User> toBeDeleted = userRepository.findById(userId);
+    if (toBeDeleted.isEmpty()) throw new InvalidUserException("No user found with id: " + userId);
+    userRepository.deleteById(userId);
     return toBeDeleted.get();
   }
 
   @Transactional(rollbackFor = InvalidUserException.class)
   @Override
-  public User updateUser(Long employeeId, User user) {
-    Optional<User> toBeUpdated = userRepository.findById(employeeId);
-    if (!toBeUpdated.isPresent())
-      throw new InvalidUserException("No user found with id: " + employeeId);
-    if (!user.getEmployeeId().equals(toBeUpdated.get().getEmployeeId()))
-      throw new InvalidUserException("employeeId's do not match");
-    return userRepository.save(user);
+  public Optional<User> updateUser(
+      Long userId, String firstName, String lastName, String emailAddress, Long approverId) {
+    Optional<User> toBeUpdated = userRepository.findById(userId);
+    if (toBeUpdated.isEmpty()) return Optional.empty();
+    User presentUser = toBeUpdated.get();
+
+    presentUser.setFirstName(firstName);
+    presentUser.setLastName(lastName);
+    presentUser.setEmailAddress(emailAddress);
+    presentUser.setApproverId(approverId);
+
+    return Optional.of(userRepository.save(presentUser));
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Optional<User> getUserById(Long employeeId) {
-    return userRepository.findById(employeeId);
+  public Optional<User> getUserById(Long userId) {
+    return userRepository.findById(userId);
   }
 
   @Transactional(readOnly = true)
@@ -68,10 +73,10 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<User> getAllUsersByApprover(Long approverId) {
     Optional<User> approver = userRepository.findById(approverId);
-    if (!approver.isPresent())
+    if (approver.isEmpty())
       throw new InvalidUserException("No approver found with id: " + approverId);
     Optional<List<User>> userList = userRepository.findAllByApproverId(approverId);
-    if (!userList.isPresent())
+    if (userList.isEmpty())
       throw new InvalidUserException("No users found for the approver with id: " + approverId);
     return userList.get();
   }

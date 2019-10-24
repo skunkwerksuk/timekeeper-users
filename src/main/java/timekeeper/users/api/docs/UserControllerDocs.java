@@ -2,23 +2,25 @@ package timekeeper.users.api.docs;
 
 import io.swagger.annotations.*;
 import java.util.List;
-import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import timekeeper.users.models.User;
 
 @Api(value = "User API", description = "Endpoints allowing CRUD operations on the user table")
 public interface UserControllerDocs {
-  @ApiOperation(value = "Get a user by employeeId", response = User.class)
+  @ApiOperation(value = "Get a user by userId", response = User.class)
   @ApiResponses(
       value = {
         @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 404, message = "No user found with id: {employeeId}"),
+        @ApiResponse(code = 404, message = "No user found with id: {userId}"),
         @ApiResponse(code = 500, message = "Internal server error")
       })
   @GetMapping("/get-user-by-id")
   ResponseEntity<User> getUserById(
-      @ApiParam(value = "The id of the user", required = true) long employeeId);
+      @ApiParam(value = "The id of the user", required = true) long userId);
 
   @ApiOperation(value = "Get a user by their email address", response = User.class)
   @ApiResponses(
@@ -64,15 +66,16 @@ public interface UserControllerDocs {
   @ApiResponses(
       value = {
         @ApiResponse(code = 201, message = "User {emailAddress} successfully created."),
-        @ApiResponse(code = 409, message = "User already exists with id: {employeeId}"),
+        @ApiResponse(code = 409, message = "User already exists with id: {userId}"),
         @ApiResponse(code = 500, message = "Internal server error")
       })
   @PostMapping("/create-user")
   ResponseEntity createUser(
-      @ApiParam(value = "The user object to be added to the database", required = true)
-          @Valid
-          @RequestBody
-          User userToAdd);
+      @ApiParam(value = "The first name of the new user", required = true) String firstName,
+      @ApiParam(value = "The last name of the new user", required = true) String lastName,
+      @ApiParam(value = "The email address of the new user", required = true) String emailAddress,
+      @ApiParam(value = "The id of the user who approves the new users absences", required = true)
+          Long approverId);
 
   @ApiOperation(value = "Update a user in the database")
   @ApiResponses(
@@ -83,9 +86,14 @@ public interface UserControllerDocs {
       })
   @PutMapping("/update-user")
   ResponseEntity updateUser(
-      @ApiParam(value = "The id of the user to be updated", required = true) long userId,
-      @ApiParam(value = "The user object with the updated details", required = true)
-          User userToUpdate);
+      @ApiParam(value = "The id of the user to be updated", required = true) Long userId,
+      @ApiParam(value = "The first name of the user to be updated", required = true)
+          String firstName,
+      @ApiParam(value = "The last name of the user to be updated", required = true) String lastName,
+      @ApiParam(value = "The email address of the user to be updated", required = true)
+          String emailAddress,
+      @ApiParam(value = "The id of the user who approves the users absences", required = true)
+          Long approverId);
 
   @ApiOperation(value = "Delete a user from the database")
   @ApiResponses(

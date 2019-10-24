@@ -16,7 +16,7 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @ApiModelProperty(notes = "The database generated employee ID")
-  private Long employeeId;
+  private Long userId;
 
   @Column(name = "first_name", nullable = false)
   @ApiModelProperty(notes = "The users first name")
@@ -31,6 +31,6 @@ public class User {
   private String emailAddress;
 
   @Column(name = "approver_id")
-  @ApiModelProperty(notes = "The employeeId of the user that can approve this users absences")
+  @ApiModelProperty(notes = "The userId of the user that can approve this users absences")
   private Long approverId;
 }
