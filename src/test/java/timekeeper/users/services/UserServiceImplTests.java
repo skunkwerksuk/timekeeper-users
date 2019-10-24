@@ -23,15 +23,12 @@ import timekeeper.users.services.impls.UserServiceImpl;
 public class UserServiceImplTests {
 
   private UserServiceImpl userService;
-
   private UserRepository mockUserRepository;
 
   @Before
   public void setUp() {
-    userService = new UserServiceImpl();
-
     mockUserRepository = mock(UserRepository.class);
-    userService.setUserRepository(mockUserRepository);
+    userService = new UserServiceImpl(mockUserRepository);
   }
 
   @Test

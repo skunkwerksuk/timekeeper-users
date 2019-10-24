@@ -33,9 +33,8 @@ public class UserControllerImplTests {
 
   @Before
   public void setUp() {
-    controller = new UserControllerImpl();
     mockUserService = mock(UserServiceImpl.class);
-    controller.setUserService(mockUserService);
+    controller = new UserControllerImpl(mockUserService);
   }
 
   @Test
