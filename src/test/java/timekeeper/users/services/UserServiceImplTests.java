@@ -1,7 +1,6 @@
 package timekeeper.users.services;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static timekeeper.users.utils.TestUtils.getDefaultUser;
@@ -97,47 +96,51 @@ public class UserServiceImplTests {
   @Test
   public void updateUser_successful() {
     User originalUser = getDefaultUser();
-    User toBeUpdated = getDefaultUser();
-    toBeUpdated.setFirstName("Thomas");
+    User toBeUpdated =
+        new User(
+            originalUser.getUserId(),
+            "Thomas",
+            originalUser.getLastName(),
+            originalUser.getEmailAddress(),
+            originalUser.getApproverId());
 
     when(mockUserRepository.findById(toBeUpdated.getUserId()))
         .thenReturn(Optional.of(originalUser));
+
     when(mockUserRepository.save(toBeUpdated)).thenReturn(toBeUpdated);
 
-    User updatedUser = userService.updateUser(originalUser.getUserId(), toBeUpdated);
+    User updatedUser =
+        userService
+            .updateUser(
+                toBeUpdated.getUserId(),
+                toBeUpdated.getFirstName(),
+                toBeUpdated.getLastName(),
+                toBeUpdated.getEmailAddress(),
+                toBeUpdated.getApproverId())
+            .get();
+
+    assertEquals("Thomas", updatedUser.getFirstName());
 
     verify(mockUserRepository, times(1)).findById(toBeUpdated.getUserId());
     verify(mockUserRepository, times(1)).save(any(User.class));
     verifyNoMoreInteractions(mockUserRepository);
-
-    assertNotEquals(originalUser.getFirstName(), updatedUser.getFirstName());
-    assertEquals("Thomas", updatedUser.getFirstName());
   }
 
-  @Test(expected = InvalidUserException.class)
   public void updateUser_notFound() {
     User toBeUpdated = getDefaultUser();
 
     when(mockUserRepository.findById(toBeUpdated.getUserId())).thenReturn(Optional.empty());
 
-    userService.updateUser(toBeUpdated.getUserId(), toBeUpdated);
+    Optional<User> actualUser =
+        userService.updateUser(
+            toBeUpdated.getUserId(),
+            toBeUpdated.getFirstName(),
+            toBeUpdated.getLastName(),
+            toBeUpdated.getEmailAddress(),
+            toBeUpdated.getApproverId());
 
+    assertEquals(Optional.empty(), actualUser);
     verify(mockUserRepository, times(1)).findById(toBeUpdated.getUserId());
-    verifyNoMoreInteractions(mockUserRepository);
-  }
-
-  @Test(expected = InvalidUserException.class)
-  public void updateUser_differentIds() {
-    User toBeUpdated = getDefaultUser();
-    User originalUser = getDefaultUser();
-    originalUser.setUserId((long) 54321);
-
-    when(mockUserRepository.findById(originalUser.getUserId()))
-        .thenReturn(Optional.of(originalUser));
-
-    userService.updateUser(toBeUpdated.getUserId(), toBeUpdated);
-
-    verify(mockUserRepository, times(1)).findById(originalUser.getUserId());
     verifyNoMoreInteractions(mockUserRepository);
   }
 

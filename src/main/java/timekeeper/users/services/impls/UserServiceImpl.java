@@ -30,21 +30,29 @@ public class UserServiceImpl implements UserService {
   @Override
   public User deleteUser(Long userId) throws InvalidUserException {
     Optional<User> toBeDeleted = userRepository.findById(userId);
-    if (!toBeDeleted.isPresent())
-      throw new InvalidUserException("No user found with id: " + userId);
+    if (toBeDeleted.isEmpty()) throw new InvalidUserException("No user found with id: " + userId);
     userRepository.deleteById(userId);
     return toBeDeleted.get();
   }
 
   @Transactional(rollbackFor = InvalidUserException.class)
   @Override
-  public User updateUser(Long userId, User user) {
+  public Optional<User> updateUser(
+      Long userId, String firstName, String lastName, String emailAddress, Long approverId) {
     Optional<User> toBeUpdated = userRepository.findById(userId);
-    if (!toBeUpdated.isPresent())
-      throw new InvalidUserException("No user found with id: " + userId);
-    if (!user.getUserId().equals(toBeUpdated.get().getUserId()))
-      throw new InvalidUserException("userId's do not match");
-    return userRepository.save(user);
+    if (toBeUpdated.isEmpty()) return Optional.empty();
+    User presentUser = toBeUpdated.get();
+
+    presentUser.setFirstName(firstName);
+    presentUser.setLastName(lastName);
+    presentUser.setEmailAddress(emailAddress);
+    presentUser.setApproverId(approverId);
+
+    System.out.println("Parameter being passed in: " + firstName);
+    System.out.println("Original user first name: " + toBeUpdated.get().getFirstName());
+    System.out.println("First name being set: " + presentUser.getFirstName());
+
+    return Optional.of(userRepository.save(presentUser));
   }
 
   @Transactional(readOnly = true)
@@ -69,10 +77,10 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<User> getAllUsersByApprover(Long approverId) {
     Optional<User> approver = userRepository.findById(approverId);
-    if (!approver.isPresent())
+    if (approver.isEmpty())
       throw new InvalidUserException("No approver found with id: " + approverId);
     Optional<List<User>> userList = userRepository.findAllByApproverId(approverId);
-    if (!userList.isPresent())
+    if (userList.isEmpty())
       throw new InvalidUserException("No users found for the approver with id: " + approverId);
     return userList.get();
   }

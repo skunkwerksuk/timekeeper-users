@@ -67,12 +67,13 @@ public class UserControllerImpl implements UserControllerDocs {
   }
 
   @Override
-  public ResponseEntity updateUser(long userId, User userToUpdate) {
+  public ResponseEntity updateUser(
+      Long userId, String firstName, String lastName, String emailAddress, Long approverId) {
     try {
-      userService.updateUser(userId, userToUpdate);
-      return new ResponseEntity<>("User with userId " + userId + " successfully updated.", OK);
-    } catch (InvalidUserException e) {
-      throw new ResponseStatusException(NOT_FOUND, e.getLocalizedMessage());
+      return userService
+          .updateUser(userId, firstName, lastName, emailAddress, approverId)
+          .map(absence -> new ResponseEntity<>(absence, OK))
+          .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     } catch (Exception e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }

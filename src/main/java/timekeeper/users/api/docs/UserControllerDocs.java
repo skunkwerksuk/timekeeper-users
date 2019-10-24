@@ -83,9 +83,14 @@ public interface UserControllerDocs {
       })
   @PutMapping("/update-user")
   ResponseEntity updateUser(
-      @ApiParam(value = "The id of the user to be updated", required = true) long userId,
-      @ApiParam(value = "The user object with the updated details", required = true)
-          User userToUpdate);
+      @ApiParam(value = "The id of the user to be updated", required = true) Long userId,
+      @ApiParam(value = "The first name of the user to be updated", required = true)
+          String firstName,
+      @ApiParam(value = "The last name of the user to be updated", required = true) String lastName,
+      @ApiParam(value = "The email address of the user to be updated", required = true)
+          String emailAddress,
+      @ApiParam(value = "The id of the user who approves the users absences", required = true)
+          Long approverId);
 
   @ApiOperation(value = "Delete a user from the database")
   @ApiResponses(

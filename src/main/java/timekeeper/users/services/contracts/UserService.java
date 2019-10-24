@@ -10,7 +10,8 @@ public interface UserService {
 
   User deleteUser(Long userId);
 
-  User updateUser(Long userId, User user);
+  Optional<User> updateUser(
+      Long userId, String firstName, String lastName, String emailAddress, Long approverId);
 
   Optional<User> getUserById(Long userId);
 

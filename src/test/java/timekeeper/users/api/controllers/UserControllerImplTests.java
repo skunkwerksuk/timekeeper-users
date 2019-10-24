@@ -245,38 +245,73 @@ public class UserControllerImplTests {
   @Test
   public void updateUser_Successful() {
     User userToUpdate = getDefaultUser();
-    ResponseEntity expectedResponse =
-        new ResponseEntity<>("User with userId 123 successfully updated.", HttpStatus.OK);
-    when(mockUserService.updateUser(userToUpdate.getUserId(), userToUpdate))
-        .thenReturn(userToUpdate);
+    ResponseEntity<User> expectedResponse = new ResponseEntity<>(userToUpdate, HttpStatus.OK);
 
-    ResponseEntity actualResponse = controller.updateUser(userToUpdate.getUserId(), userToUpdate);
+    when(mockUserService.updateUser(
+            userToUpdate.getUserId(),
+            userToUpdate.getFirstName(),
+            userToUpdate.getLastName(),
+            userToUpdate.getEmailAddress(),
+            userToUpdate.getApproverId()))
+        .thenReturn(Optional.of(userToUpdate));
+
+    ResponseEntity actualResponse =
+        controller.updateUser(
+            userToUpdate.getUserId(),
+            userToUpdate.getFirstName(),
+            userToUpdate.getLastName(),
+            userToUpdate.getEmailAddress(),
+            userToUpdate.getApproverId());
+
+    assertEquals(expectedResponse, actualResponse);
+  }
+
+  public void updateUser_NotFound() {
+    User userToUpdate = getDefaultUser();
+    ResponseEntity expectedResponse = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+    when(mockUserService.updateUser(
+            userToUpdate.getUserId(),
+            userToUpdate.getFirstName(),
+            userToUpdate.getLastName(),
+            userToUpdate.getEmailAddress(),
+            userToUpdate.getApproverId()))
+        .thenReturn(Optional.empty());
+
+    ResponseEntity actualResponse =
+        controller.updateUser(
+            userToUpdate.getUserId(),
+            userToUpdate.getFirstName(),
+            userToUpdate.getLastName(),
+            userToUpdate.getEmailAddress(),
+            userToUpdate.getApproverId());
 
     assertEquals(expectedResponse, actualResponse);
   }
 
   @Test(expected = ResponseStatusException.class)
-  public void updateUser_NotFound() {
-    User userToUpdate = getDefaultUser();
-    when(mockUserService.updateUser(userToUpdate.getUserId(), userToUpdate))
-        .thenThrow(new InvalidUserException("user not found"));
-
-    ResponseEntity actualResponse = controller.updateUser(userToUpdate.getUserId(), userToUpdate);
-
-    assertEquals(HttpStatus.NOT_FOUND, actualResponse.getStatusCode());
-    assertEquals("user not found", Objects.requireNonNull(actualResponse.getBody()).toString());
-  }
-
-  @Test(expected = ResponseStatusException.class)
   public void updateUser_InternalServerError() {
     User userToUpdate = getDefaultUser();
-    when(mockUserService.updateUser(userToUpdate.getUserId(), userToUpdate))
+    ResponseEntity expectedResponse =
+        new ResponseEntity<>("something broke", HttpStatus.INTERNAL_SERVER_ERROR);
+
+    when(mockUserService.updateUser(
+            userToUpdate.getUserId(),
+            userToUpdate.getFirstName(),
+            userToUpdate.getLastName(),
+            userToUpdate.getEmailAddress(),
+            userToUpdate.getApproverId()))
         .thenThrow(new RuntimeException("something broke"));
 
-    ResponseEntity actual = controller.updateUser(userToUpdate.getUserId(), userToUpdate);
+    ResponseEntity actualResponse =
+        controller.updateUser(
+            userToUpdate.getUserId(),
+            userToUpdate.getFirstName(),
+            userToUpdate.getLastName(),
+            userToUpdate.getEmailAddress(),
+            userToUpdate.getApproverId());
 
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actual.getStatusCode());
-    assertEquals("something broke", Objects.requireNonNull(actual.getBody()).toString());
+    assertEquals(expectedResponse, actualResponse);
   }
 
   @Test
