@@ -14,7 +14,12 @@ import timekeeper.users.services.contracts.UserService;
 @Service
 public class UserServiceImpl implements UserService {
 
-  @Autowired @Resource UserRepository userRepository;
+  @Resource final UserRepository userRepository;
+
+  @Autowired
+  public UserServiceImpl(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   @Transactional
   @Override
@@ -79,14 +84,5 @@ public class UserServiceImpl implements UserService {
     if (userList.isEmpty())
       throw new InvalidUserException("No users found for the approver with id: " + approverId);
     return userList.get();
-  }
-
-  /**
-   * This setter method should be used only by unit tests.
-   *
-   * @param userRepository
-   */
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
   }
 }

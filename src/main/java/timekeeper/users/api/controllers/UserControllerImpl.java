@@ -15,7 +15,12 @@ import timekeeper.users.services.contracts.UserService;
 @RestController
 public class UserControllerImpl implements UserControllerDocs {
 
-  @Autowired UserService userService;
+  private final UserService userService;
+
+  @Autowired
+  public UserControllerImpl(UserService userService) {
+    this.userService = userService;
+  }
 
   @Override
   public ResponseEntity<User> getUserById(long userId) {
@@ -101,14 +106,5 @@ public class UserControllerImpl implements UserControllerDocs {
     } catch (Exception e) {
       throw new ResponseStatusException(INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
     }
-  }
-
-  /**
-   * This setter method should be used only by unit tests.
-   *
-   * @param userService
-   */
-  public void setUserService(UserService userService) {
-    this.userService = userService;
   }
 }
